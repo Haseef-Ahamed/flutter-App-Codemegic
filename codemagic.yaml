@@ -1,19 +1,19 @@
 workflows:
   android-workflow:
     name: Android Development Build
-    max_build_duration: 60
-    instance_type: mac_mini_m1
-    triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: 'Dev'
-          include: true
-          source: true
-        - pattern: 'Hsf'
-          include: true
-          source: true
-      cancel_previous_builds: true
+    # max_build_duration: 60
+    # instance_type: mac_mini_m1
+    # triggering:
+    #   events:
+    #     - push
+    #   branch_patterns:
+    #     - pattern: 'Dev'
+    #       include: true
+    #       source: true
+    #     - pattern: 'Hsf'
+    #       include: true
+    #       source: true
+    #   cancel_previous_builds: true
     environment:
       # ✅ NO android_signing section - we don't need it for Firebase!
       groups:
@@ -66,7 +66,7 @@ workflows:
     
     publishing:
       firebase:
-        firebase_service_account: $FIREBASE_SERVICE_ACCOUNT
+        firebase_service_account: $Firebase_service_Account
         android:
           app_id: $FIREBASE_ANDROID_APP_ID
           groups:

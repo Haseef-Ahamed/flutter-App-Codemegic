@@ -40,29 +40,29 @@ workflows:
           flutter test
         ignore_failure: true
       
-      - name: 🤖 Build Android APK
+      - name: Build AAB with Flutter
         script: | 
-          # Build with timestamp-based build number
-          BUILD_NUMBER=$(($(date +%s) / 60))
-          echo "Building with build number: $BUILD_NUMBER"
-          
-          # Build release APK (uses debug signing by default)
-          flutter build apk --release \
+          BUILD_NUMBER=$(($(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK") + 1))      
+          flutter build appbundle --release \
             --build-name=1.0.$BUILD_NUMBER \
             --build-number=$BUILD_NUMBER
-      
-      - name: ✅ Verify APK
-        script: | 
-          APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
-          if [ ! -f "$APK_PATH" ]; then
-            echo "❌ APK not found"
-            exit 1
-          fi
-          echo "✅ APK built successfully!"
-          ls -lh "$APK_PATH"
-    
     artifacts:
-      - build/app/outputs/flutter-apk/*.apk
+      - build/**/outputs/**/*.aab
+      - build/**/outputs/**/mapping.txt
+      - flutter_drive.log
+      
+    #   - name: ✅ Verify APK
+    #     script: | 
+    #       APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
+    #       if [ ! -f "$APK_PATH" ]; then
+    #         echo "❌ APK not found"
+    #         exit 1
+    #       fi
+    #       echo "✅ APK built successfully!"
+    #       ls -lh "$APK_PATH"
+    
+    # artifacts:
+    #   - build/app/outputs/flutter-apk/*.apk
     
     publishing:
       firebase:

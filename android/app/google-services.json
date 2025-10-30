@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "722791783289",
+    "project_id": "cide-demo",
+    "storage_bucket": "cide-demo.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:722791783289:android:032aac970d0ccb5779eda8",
+        "android_client_info": {
+          "package_name": "com.example.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQz3hKXgwo03xO5Y3fDsL9SlHLMcSTZ1c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

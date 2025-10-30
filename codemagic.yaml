@@ -1,7 +1,4 @@
 workflows:
-  # ============================================================================
-  # ANDROID - Free Firebase Distribution (No Play Store)
-  # ============================================================================
   android-workflow:
     name: Android Development Build
     max_build_duration: 60
@@ -9,7 +6,6 @@ workflows:
     triggering:
       events:
         - push
-        - pull_request
       branch_patterns:
         - pattern: 'Dev'
           include: true
@@ -19,18 +15,14 @@ workflows:
           source: true
       cancel_previous_builds: true
     environment:
+      # ✅ NO android_signing section - we don't need it for Firebase!
       groups:
-        - firebase_config  # We'll create this group
+        - firebase_config  # Only Firebase credentials needed
       vars:
-        PACKAGE_NAME: "io.codemagic.fluttersample"  # Update with your package name
+        PACKAGE_NAME: "io.codemagic.fluttersample"  # TODO: Update this
       flutter: stable
       xcode: latest
     scripts:
-      - name: 📋 Flutter Version Check
-        script: | 
-          flutter --version
-          flutter doctor -v
-      
       - name: 🔧 Set up local.properties
         script: | 
           echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
@@ -43,16 +35,18 @@ workflows:
         script: | 
           flutter analyze --no-fatal-infos
       
-      - name: 🧪 Flutter unit tests
+      - name: 🧪 Flutter tests
         script: | 
-          flutter test --coverage
+          flutter test
         ignore_failure: true
       
-      - name: 🤖 Build Android APK (Release)
+      - name: 🤖 Build Android APK
         script: | 
-          BUILD_NUMBER=$(($(date +%s) / 60))  # Unix timestamp in minutes
+          # Build with timestamp-based build number
+          BUILD_NUMBER=$(($(date +%s) / 60))
           echo "Building with build number: $BUILD_NUMBER"
           
+          # Build release APK (uses debug signing by default)
           flutter build apk --release \
             --build-name=1.0.$BUILD_NUMBER \
             --build-number=$BUILD_NUMBER
@@ -61,28 +55,16 @@ workflows:
         script: | 
           APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
           if [ ! -f "$APK_PATH" ]; then
-            echo "❌ APK not found at $APK_PATH"
+            echo "❌ APK not found"
             exit 1
           fi
-          
           echo "✅ APK built successfully!"
           ls -lh "$APK_PATH"
-          
-          # Get APK size
-          APK_SIZE=$(du -h "$APK_PATH" | cut -f1)
-          echo "📦 APK Size: $APK_SIZE"
-          
-          # Get APK info
-          echo "📱 APK Info:"
-          aapt dump badging "$APK_PATH" | grep -E "package:|sdkVersion:|targetSdkVersion:"
     
     artifacts:
       - build/app/outputs/flutter-apk/*.apk
-      - build/app/outputs/bundle/**/*.aab
-      - coverage/lcov.info
     
     publishing:
-      # Free Firebase App Distribution
       firebase:
         firebase_service_account: $FIREBASE_SERVICE_ACCOUNT
         android:
@@ -91,7 +73,6 @@ workflows:
             - testers
           artifact_type: 'apk'
       
-      # Email notifications
       email:
         recipients:
           - mshaseefat@gmail.com
